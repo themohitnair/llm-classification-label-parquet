@@ -10,8 +10,10 @@ dependencies = [
     "dotenv>=0.9.9",
     "ollama>=0.5.3",
     "openai>=1.101.0",
+    "pandas>=2.3.2",
     "parquet>=1.3.1",
     "pyarrow>=21.0.0",
     "pydantic>=2.11.7",
+    "scikit-learn>=1.7.1",
     "transformers>=4.55.4",
 ]
