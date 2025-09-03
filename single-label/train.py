@@ -88,7 +88,7 @@ def main():
         num_train_epochs=args.epochs,
         per_device_train_batch_size=args.train_bs,
         per_device_eval_batch_size=args.eval_bs,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         logging_steps=20,
         save_total_limit=2,
         warmup_ratio=0.06,
