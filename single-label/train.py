@@ -56,7 +56,7 @@ def main():
     parser.add_argument("--output_dir", type=str, required=True, help="Directory for output")
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--lr", type=float, default=2e-5)
-    parser.add_argument("--train_bs", type=int, default=16)
+    parser.add_argument("--train_bs", type=int, default=128)
     parser.add_argument("--eval_bs", type=int, default=32)
     args = parser.parse_args()
 
@@ -80,7 +80,6 @@ def main():
     )
     model.to("cuda" if torch.cuda.is_available() else "cpu")
     data_collator = DataCollatorWithPadding(tokenizer)
-    fp16 = torch.cuda.is_available()
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,
@@ -88,21 +87,22 @@ def main():
         num_train_epochs=args.epochs,
         per_device_train_batch_size=args.train_bs,
         per_device_eval_batch_size=args.eval_bs,
-        eval_strategy="steps",
-        logging_steps=20,
+        eval_strategy="epoch",
+        logging_steps=100,
         save_total_limit=2,
         warmup_ratio=0.06,
         weight_decay=0.01,
-        fp16=fp16,
+        bf16=True,
         load_best_model_at_end=True,
-        metric_for_best_model="f1_macro" if _SKLEARN_OK else "accuracy",
+        metric_for_best_model="f1_macro",
         greater_is_better=True,
         seed=42,
+        save_strategy="epoch",
         report_to="none"
     )
 
     def tokenize(batch):
-        return tokenizer(batch["text"], truncation=True, padding=False, max_length=256)
+        return tokenizer(batch["text"], truncation=True, padding=False, max_length=512)
 
     train_ds_tok = train_ds.map(tokenize, batched=True)
     eval_ds_tok = eval_ds.map(tokenize, batched=True)
